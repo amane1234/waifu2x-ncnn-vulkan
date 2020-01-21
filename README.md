@@ -1,20 +1,21 @@
 # waifu2x ncnn Vulkan
 
-ncnn implementation of waifu2x converter. Runs fast on Intel / AMD / Nvidia with Vulkan API.
+waifu2x에 불칸 api를 사용해서 "인텔 내장그래픽 / AMD 그래픽 / 엔비디아 그래픽 " 모두 사용하가능하게 만듬
 
-waifu2x-ncnn-vulkan uses [ncnn project](https://github.com/Tencent/ncnn) as the universal neural network inference framework.
+waifu2x-ncnn-vulkan 은 [ncnn project](https://github.com/Tencent/ncnn)을 프레임 워크로 사용함, 흥미있다면 한번 봐보세요
 
 ## [Download](https://github.com/nihui/waifu2x-ncnn-vulkan/releases)
 
-Download Windows Executable for Intel/AMD/Nvidia GPU
+윈도우용 waifu2x-ncnn-vulkan 다운로드:
 
 **https://github.com/nihui/waifu2x-ncnn-vulkan/releases**
 
-This package includes all the binaries and models required. It is portable, so no CUDA or Caffe runtime environment is needed :)
+패키지는 모델등 필요한 모듈들을 내장하고 있으니, CUDA 와 CUDNN 등이 필요 없음.
 
-## Usages
 
-### Example Command
+## 사용방법
+
+### 사용 예시:
 
 ```shell
 waifu2x-ncnn-vulkan.exe -i input.jpg -o output.png -n 2 -s 2
@@ -25,119 +26,28 @@ waifu2x-ncnn-vulkan.exe -i input.jpg -o output.png -n 2 -s 2
 ```console
 Usage: waifu2x-ncnn-vulkan -i infile -o outfile [options]...
 
-  -h                   show this help
+  -h                  도움말
   -v                   verbose output
-  -i input-path        input image path (jpg/png) or directory
-  -o output-path       output image path (png) or directory
-  -n noise-level       denoise level (-1/0/1/2/3, default=0)
-  -s scale             upscale ratio (1/2, default=2)
-  -t tile-size         tile size (>=32, default=400)
-  -m model-path        waifu2x model path (default=models-cunet)
-  -g gpu-id            gpu device to use (default=0)
+  -i input-path        input 경로
+  -o output-path       output 으로 저장될 경로
+  -n noise-level       디노이즈 단계 1/2/3 (디노이즈를 안하고 싶으면 -1 을 넣으면됨) 
+  -s scale             X배로 부풀릴 단계, (현재 정수중 1,2 만 지원)
+  -t tile-size         타일 크기 (>=32, default=400), GPU의 성능에 따라 크기를 조절하자
+  -m model-path        업스케일의 모델의 경로
+  -g gpu-id            GPU 장치 번호 선택 (default=0) , SLI나 크로스파이어 시 두개중 하나만 사용하고 싶을때 선택
   -j load:proc:save    thread count for load/proc/save (default=1:2:2)
 ```
 
-- `input-path` and `output-path` accept either file path or directory path
-- `noise-level` = noise level, large value means strong denoise effect, -1=no effect
+- `input-path` 과 `output-path` 둘 다 단일 파일 혹은 선택한 디렉토리 안에 들어있는 파일 전부로 선택 가능
+- `noise-level` = 디노이즈 레벨, (정수) 숫자가 커질수록 디노이즈 단계가 더 강하게 된다
 - `scale` = scale level, 1=no scale, 2=upscale 2x
-- `tile-size` = tile size, use smaller value to reduce GPU memory usage, default is 400
-- `load:proc:save` = thread count for the three stages (image decoding + waifu2x upscaling + image encoding), use larger value may increase GPU utility and consume more GPU memory. You can tune this configuration as "4:4:4" for many small-size images, and "2:2:2" for large-size images. The default setting usually works fine for most situations. If you find that your GPU is hungry, do increase thread count to achieve faster processing.
+- `tile-size` = 타일크기, GPU의 성능에 따라서 크기를 조절 가능함
+- `load:proc:save` = (load: 이미지 디코딩 , proc : 업스케일 , save: 이미지 인코딩) 사용 시 사용할 쓰레드 숫자를 정하는 패러미터. GPU의 성능에 따라서 조절 할 수 있다. 예를들어 4:4:4 는 해상도가 작은 여러 파일들을 프로세싱 할때, 2:2:2는 해상도가 큰 파일들을 프로세싱시 쓰면된다. 기본적으로 설정이 된 1:2:2 의 값은 거의 모든 상황에서 쓸 수 있지만 GPU의 리소스가 남을떄 더 빠른 프로세싱을 위해서, 반대로 리소스가 부족할시 값을 바꾸면 된다.
 
-If you encounter crash or error, try to upgrade your GPU driver
+드라이버 오류가 날 시, 최신 드라이버로 업데이트 하는걸 권장함
 
 - Intel: https://downloadcenter.intel.com/product/80939/Graphics-Drivers
 - AMD: https://www.amd.com/en/support
 - NVIDIA: https://www.nvidia.com/Download/index.aspx
 
-## Speed Comparison with waifu2x-caffe-cui
-
-### Environment
-
-- Windows 10 1809
-- AMD R7-1700
-- Nvidia GTX-1070
-- Nvidia driver 419.67
-- CUDA 10.1.105
-- cuDNN 10.1
-
-```powershell
-Measure-Command { waifu2x-ncnn-vulkan.exe -i input.png -o output.png -n 2 -s 2 [block size] -m [model dir] }
-```
-
-```powershell
-Measure-Command { waifu2x-caffe-cui.exe -t 0 --gpu 0 -b 1 -c [block size] -p cudnn --model_dir [model dir] -s 2 -n 2 -m noise_scale -i input.png -o output.png }
-```
-
-### cunet
-
-||Image Size|Target Size|Block Size|Total Time(s)|GPU Memory(MB)|
-|---|---|---|---|---|---|
-|waifu2x-ncnn-vulkan|200x200|400x400|400/200/100|0.86/0.86/0.82|638/638/197|
-|waifu2x-caffe-cui|200x200|400x400|400/200/100|2.54/2.39/2.36|3017/936/843|
-|waifu2x-ncnn-vulkan|400x400|800x800|400/200/100|1.17/1.04/1.02|2430/638/197|
-|waifu2x-caffe-cui|400x400|800x800|400/200/100|2.91/2.43/2.7|3202/1389/1178|
-|waifu2x-ncnn-vulkan|1000x1000|2000x2000|400/200/100|2.35/2.26/2.46|2430/638/197|
-|waifu2x-caffe-cui|1000x1000|2000x2000|400/200/100|4.04/3.79/4.35|3258/1582/1175|
-|waifu2x-ncnn-vulkan|2000x2000|4000x4000|400/200/100|6.46/6.59/7.49|2430/686/213|
-|waifu2x-caffe-cui|2000x2000|4000x4000|400/200/100|7.01/7.54/10.11|3258/1499/1200|
-|waifu2x-ncnn-vulkan|4000x4000|8000x8000|400/200/100|22.78/23.78/27.61|2448/654/213|
-|waifu2x-caffe-cui|4000x4000|8000x8000|400/200/100|18.45/21.85/31.82|3325/1652/1236|
-
-### upconv_7_anime_style_art_rgb
-
-||Image Size|Target Size|Block Size|Total Time(s)|GPU Memory(MB)|
-|---|---|---|---|---|---|
-|waifu2x-ncnn-vulkan|200x200|400x400|400/200/100|0.74/0.75/0.72|482/482/142|
-|waifu2x-caffe-cui|200x200|400x400|400/200/100|2.04/1.99/1.99|995/546/459|
-|waifu2x-ncnn-vulkan|400x400|800x800|400/200/100|0.95/0.83/0.81|1762/482/142|
-|waifu2x-caffe-cui|400x400|800x800|400/200/100|2.08/2.12/2.11|995/546/459|
-|waifu2x-ncnn-vulkan|1000x1000|2000x2000|400/200/100|1.52/1.41/1.44|1778/482/142|
-|waifu2x-caffe-cui|1000x1000|2000x2000|400/200/100|2.72/2.60/2.68|1015/570/459|
-|waifu2x-ncnn-vulkan|2000x2000|4000x4000|400/200/100|3.45/3.42/3.63|1778/482/142|
-|waifu2x-caffe-cui|2000x2000|4000x4000|400/200/100|3.90/4.01/4.35|1015/521/462|
-|waifu2x-ncnn-vulkan|4000x4000|8000x8000|400/200/100|11.16/11.29/12.07|1796/498/158|
-|waifu2x-caffe-cui|4000x4000|8000x8000|400/200/100|9.24/9.81/11.16|995/546/436|
-
-## Sample Images
-
-### Original Image
-
-![origin](images/0.jpg)
-
-### Upscale 2x with ImageMagick
-
-```shell
-convert origin.jpg -resize 200% output.png
-```
-
-![browser](images/1.png)
-
-### Upscale 2x with ImageMagick Lanczo4 Filter
-
-```shell
-convert origin.jpg -filter Lanczos -resize 200% output.png
-```
-
-![browser](images/4.png)
-
-### Upscale 2x with waifu2x noise=2 scale=2
-
-```shell
-waifu2x-ncnn-vulkan.exe -i origin.jpg -o output.png -n 2 -s 2
-```
-
-![waifu2x](images/2.png)
-
-## Original waifu2x Project
-
-- https://github.com/nagadomi/waifu2x
-- https://github.com/lltcggie/waifu2x-caffe
-
-## ncnn Project (>=20190712)
-
-- https://github.com/Tencent/ncnn/tree/8c537069875a28d5380c6bdcbf7964d73803b7b3
-
-## Other Open-Source Code Used
-
-- https://github.com/nothings/stb for decoding and encoding image on Linux / MacOS
-- https://github.com/tronkko/dirent for listing files in directory on Windows
+WAIFU2x-CAFFE 보다 약 1.5배 정도 빠르다
