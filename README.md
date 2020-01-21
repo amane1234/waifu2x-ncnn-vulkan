@@ -1,6 +1,6 @@
 # waifu2x ncnn Vulkan
 
-waifu2x에 불칸 api를 사용해서 "인텔 내장그래픽 / AMD 그래픽 / 엔비디아 그래픽 " 모두 사용하가능하게 만듬
+waifu2x에 불칸 api를 사용해서 "인텔 내장그래픽 / AMD 그래픽 / 엔비디아 그래픽 " 모두 사용가능하게 만듬
 
 waifu2x-ncnn-vulkan 은 [ncnn project](https://github.com/Tencent/ncnn)을 프레임 워크로 사용함, 흥미있다면 한번 봐보세요
 
