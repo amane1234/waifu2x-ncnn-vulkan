@@ -18,13 +18,23 @@ waifu2x-ncnn-vulkan 은 [ncnn project](https://github.com/Tencent/ncnn)을 프�
 ### 사용 예시:
 
 ```shell
+
+단일 파일 사용:
 waifu2x-ncnn-vulkan.exe -i input.jpg -o output.png -n 2 -s 2
+
+
+디렉토리안에 있는 모든 파일을 png 파일로 변경할 시:
+waifu2x-ncnn-vulkan.exe -i C:\Users\amane\Desktop\ffmpeg\input\%05d.jpg -o C:\Users\amane\Desktop\ffmpeg\output\ - n 2 -s 2 -t 500
+
+
+C:\Users\amane\Desktop\ffmpeg\input\ 에 들어있는 00001.jpg , 000002.jpg ... 들을 전부 업스케일링 하여서
+C:\Users\amane\Desktop\ffmpeg\output\ 에 저장한다
 ```
 
 ### Full Usages
 
 ```console
-Usage: waifu2x-ncnn-vulkan -i infile -o outfile [options]...
+Usage: waifu2x-ncnn-vulkan -i <input dir> -o <output dir> [options]...
 
   -h                  도움말
   -v                   verbose output
