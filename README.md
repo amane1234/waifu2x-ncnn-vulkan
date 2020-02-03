@@ -24,10 +24,10 @@ waifu2x-ncnn-vulkan.exe -i input.jpg -o output.png -n 2 -s 2
 
 
 디렉토리안에 있는 모든 파일을 png 파일로 변경할 시:
-waifu2x-ncnn-vulkan.exe -i C:\Users\amane\Desktop\ffmpeg\input\%05d.jpg -o C:\Users\amane\Desktop\ffmpeg\output\ - n 2 -s 2 -t 500
+waifu2x-ncnn-vulkan.exe -i C:\Users\amane\Desktop\ffmpeg\input\ -o C:\Users\amane\Desktop\ffmpeg\output\ - n 2 -s 2 -t 500
 
 
-C:\Users\amane\Desktop\ffmpeg\input\ 에 들어있는 00001.jpg , 000002.jpg ... 들을 전부 업스케일링 하여서
+C:\Users\amane\Desktop\ffmpeg\input\ 에 들어있는 사진 파일들 (.jpg , .png , .jpeg ...) 을 전부 업스케일링 하여서
 C:\Users\amane\Desktop\ffmpeg\output\ 에 저장한다
 ```
 
